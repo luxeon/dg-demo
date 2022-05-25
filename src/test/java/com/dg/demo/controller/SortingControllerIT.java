@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.dg.demo.input.OrderType.ASC;
 import static com.dg.demo.input.OrderType.DESC;
@@ -50,11 +51,12 @@ class SortingControllerIT {
 
     @Test
     void shouldReturnBadRequestWhenNoNumbersPresent() throws Exception {
-        mockMvc.perform(post("/sort").content(inputOf(ASC))
+        String[] numbers = null;
+        mockMvc.perform(post("/sort").content(inputOf("asc", numbers))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("[{\"fieldName\":\"numbers\",\"message\":\"size must be between 1 and 100\"}]"));
+                .andExpect(content().json("[{\"fieldName\":\"numbers\",\"message\":\"must not be null\"}]"));
     }
 
     @Test
@@ -80,19 +82,34 @@ class SortingControllerIT {
     }
 
     @Test
-    void shouldDoSomethingInCaseOfCorruptedNumbers() throws Exception {
-        mockMvc.perform(post("/sort").content("{\"order\":\"asc\", \"numbers\":[1, 2, abc}")
+    void shouldReturnBadRequestInCaseOfCorruptedNumbers() throws Exception {
+        mockMvc.perform(post("/sort").content(inputOf("asc", "1", "2", "abc"))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("{\"message\":\"Internal server error\"}"));
+                .andExpect(content().json("{\"message\":\"Incorrect numbers.\"}"));
+    }
+
+    @Test
+    void shouldReturnBadRequestInCaseOfIncorrectOrderType() throws Exception {
+        mockMvc.perform(post("/sort").content(inputOf("incorrect", "3", "2", "5"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"message\":\"Incorrect order type.\"}"));
     }
 
     @SneakyThrows
     private String inputOf(OrderType orderType, Integer... numbers) {
+        String type = orderType == null ? null : orderType.name().toLowerCase();
+        return inputOf(type, Stream.of(numbers).map(String::valueOf).toArray(String[]::new));
+    }
+
+    @SneakyThrows
+    private String inputOf(String orderType, String... numbers) {
         SortingInput input = new SortingInput();
-        input.setOrder(orderType == null ? null : orderType.name().toLowerCase());
-        input.setNumbers(List.of(numbers));
+        input.setOrder(orderType);
+        input.setNumbers(numbers == null ? null : List.of(numbers));
         return objectMapper.writeValueAsString(input);
     }
 

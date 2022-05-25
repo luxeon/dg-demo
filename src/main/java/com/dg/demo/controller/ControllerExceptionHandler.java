@@ -1,6 +1,6 @@
 package com.dg.demo.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import com.dg.demo.exception.SortingException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,9 +11,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-@Slf4j
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
@@ -27,17 +25,16 @@ public class ControllerExceptionHandler {
     }
 
     @ResponseBody
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public InternalServerErrorResponse handleException(Exception e) {
-        log.error("Internal server error.", e);
-        return new InternalServerErrorResponse("Internal server error");
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(SortingException.class)
+    public SortingErrorResponse handleException(SortingException e) {
+        return new SortingErrorResponse(e.getMessage());
     }
 
 
     public record FieldValidationErrorResponse(String fieldName, String message) {
     }
 
-    public record InternalServerErrorResponse(String message) {
+    public record SortingErrorResponse(String message) {
     }
 }

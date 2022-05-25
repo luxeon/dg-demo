@@ -11,7 +11,7 @@ public class SortingInput {
 
     @NotNull
     @Size(min = 1, max = 100)
-    private List<Integer> numbers;
+    private List<String> numbers;
     @NotNull
     private String order;
 

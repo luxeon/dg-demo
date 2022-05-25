@@ -1,8 +1,11 @@
 package com.dg.demo.controller;
 
+import com.dg.demo.exception.OrderTypeNotFoundException;
+import com.dg.demo.exception.SortingException;
 import com.dg.demo.input.OrderType;
 import com.dg.demo.input.SortingInput;
 import com.dg.demo.service.SortingService;
+import com.dg.demo.util.IntUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +31,14 @@ public class SortingController {
      */
     @PostMapping("/sort")
     public List<Integer> sort(@RequestBody @Validated SortingInput input) {
-        return sortingService.sort(input.getNumbers(), OrderType.valueOf(input.getOrder().toUpperCase()));
+        try {
+            List<Integer> numbers = IntUtils.parse(input.getNumbers());
+            OrderType orderType = OrderType.get(input.getOrder());
+            return sortingService.sort(numbers, orderType);
+        } catch (NumberFormatException e) {
+            throw new SortingException("Incorrect numbers.");
+        } catch (OrderTypeNotFoundException e) {
+            throw new SortingException("Incorrect order type.");
+        }
     }
 }
