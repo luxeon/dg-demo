@@ -16,6 +16,8 @@ java -jar target/demo-0.0.1-SNAPSHOT.jar
 
 ### Sort numbers
 
+Sorts integer numbers according to specified order type.
+
 URL:
 ```
 http://localhost:9002/sort
@@ -25,7 +27,7 @@ HTTP Method: POST
 Request content type: application/json
 
 Request body fields:
-- numbers - comma separated numbers to be sorted
+- numbers - comma separated integers to be sorted
 - order - sorting order type (asc - ascending order, desc - descending order)
 
 Request body example:

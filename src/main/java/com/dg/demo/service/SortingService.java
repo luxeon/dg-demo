@@ -14,7 +14,7 @@ import java.util.List;
 public class SortingService {
 
     /**
-     * <p>Sorts numbers depending on order type.</p>
+     * <p>Sorts integers depending on order type.</p>
      * @param numbers list to be sorted
      * @param orderType descending or ascending type
      * @return new sorted list

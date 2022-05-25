@@ -23,7 +23,7 @@ public class SortingController {
     private final SortingService sortingService;
 
     /**
-     * <p>Endpoint to sort list of numbers in DESC/ASC order.</p>
+     * <p>Endpoint to sort list of integers in DESC/ASC order.</p>
      * <p>Max list size is 100 elements.</p>
      *
      * @param input is numbers to sort and order type
